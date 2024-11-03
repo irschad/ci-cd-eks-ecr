@@ -4,6 +4,10 @@ pipeline {
     tools {
         maven 'Maven'
     }
+    environment {
+        DOCKER_REPO_SERVER = '922854651834.dkr.ecr.us-east-1.amazonaws.com'
+        DOCKER_REPO = "${DOCKER_REPO_SERVER}/java-maven-app"
+    }
     stages {
           stage('increment version') {
             steps {
@@ -38,10 +42,10 @@ pipeline {
             steps {
                 script {
                     echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "docker build -t irschad/java-app:${IMAGE_NAME} ."
-                        sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push irschad/java-app:${IMAGE_NAME}"
+                    withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh "docker build -t ${DOCKER_REPO}:${IMAGE_NAME} ."
+                        sh 'echo $PASS | docker login -u $USER --password-stdin ${DOCKER_REPO_SERVER}'
+                        sh "docker push ${DOCKER_REPO}:${IMAGE_NAME}"
                     }
                 }
             }
@@ -83,7 +87,7 @@ pipeline {
                           sh 'git add .'
                           sh 'git branch'
                           sh 'git config --list'
-                          sh "git remote set-url origin https://${PAT}@github.com/irschad/complete-ci-cd-eks-dockerhub.git"
+                          sh "git remote set-url origin https://${PAT}@github.com/irschad/ci-cd-eks-ecr.git"
                           sh "git commit -m 'ci: version bump'"
                           sh 'git push origin HEAD:master'
                     }
