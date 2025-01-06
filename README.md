@@ -149,16 +149,9 @@ stage('commit version update') {
    - Commits are made with a clear message indicating a version bump.
    - The `git push` command updates the master branch with the new version.
 
-### Verify Deployment
-After the pipeline completes, verify the application is running:
-
-```bash
-kubectl get pods
-kubectl describe pod <pod_name>
-kubectl get services
 ```
 
-## Execute Jenkins Pipeline
+## Execute Jenkins Pipeline and verify deployment
 1. Commit the updated code to the GitHub repository.
 2. Ensure no conflicting pods are running in the cluster:
 
